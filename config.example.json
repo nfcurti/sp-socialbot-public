@@ -1,0 +1,25 @@
+{
+  "bots": [
+    {
+      "id": "bot1",
+      "name": "Restaurant Bot 1",
+      "credentials": {
+        "username": "YOUR_INSTAGRAM_USERNAME",
+        "password": "YOUR_INSTAGRAM_PASSWORD"
+      },
+      "hashtags": [
+        "food",
+        "cooking",
+        "pasta",
+        "pizza",
+        "restaurant"
+      ],
+      "enabled": true
+    }
+  ],
+  "scheduler": {
+    "interval": "*/30 * * * *",
+    "maxLogs": 100,
+    "scriptTimeout": 300000
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "instagram-ai-scheduler",
+  "version": "1.0.0",
+  "description": "AI-like scheduler for Instagram automation scripts",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "instagram",
+    "ai",
+    "scheduler",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT"
+}

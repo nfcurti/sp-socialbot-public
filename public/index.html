@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pianificatore AI Instagram</title>
+    <style>
+        :root {
+            --primary: #3a5ba0;
+            --primary-light: #eaf0fa;
+            --secondary: #f5f6fa;
+            --accent: #f7b731;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --gray: #6c757d;
+            --border: #e0e4ea;
+            --background: #f8fafc;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            padding: 32px;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(60,80,120,0.08);
+            overflow: hidden;
+            padding: 40px 32px 32px 32px;
+        }
+        .content {
+            padding: 0;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 18px;
+            font-size: 1.6em;
+            font-weight: 700;
+        }
+        .bots-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+        .bot-card {
+            background: var(--primary-light);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 22px 22px 22px;
+            box-shadow: 0 2px 8px rgba(60,80,120,0.04);
+            transition: box-shadow 0.2s, border 0.2s;
+        }
+        .bot-card:hover {
+            box-shadow: 0 6px 24px rgba(60,80,120,0.10);
+            border: 1.5px solid var(--primary);
+        }
+        .bot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .bot-name {
+            font-weight: 600;
+            font-size: 1.18em;
+            color: var(--primary);
+        }
+        .bot-status {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .status-enabled {
+            background: var(--success);
+            color: #fff;
+        }
+        .status-disabled {
+            background: var(--danger);
+            color: #fff;
+        }
+        .bot-info {
+            margin-bottom: 14px;
+        }
+        .bot-info p {
+            margin: 5px 0;
+            color: var(--gray);
+            font-size: 0.97em;
+        }
+        .hashtags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 8px;
+        }
+        .hashtag {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.92em;
+        }
+        .bot-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .add-bot-card {
+            background: var(--secondary);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s, border 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
+        }
+        .add-bot-card:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+        .add-bot-icon {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.18);
+            overflow-y: auto;
+        }
+        
+        /* Prevent body scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            overflow: hidden;
+            transform: scale(0.9);
+            animation: modalOpen 0.3s ease forwards;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes modalOpen {
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4a6ba7 100%);
+            color: white;
+            padding: 24px 32px;
+            margin: 0;
+            border-radius: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .modal-header .close {
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        
+        .modal-header .close:hover {
+            color: white;
+        }
+        
+        #botForm {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95em;
+        }
+        
+        .form-hint {
+            display: block;
+            margin-top: 6px;
+            color: var(--gray);
+            font-size: 0.85em;
+            line-height: 1.3;
+            font-style: italic;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 91, 160, 0.1);
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        
+        .checkbox-group {
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            margin: 0;
+            font-weight: normal;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 2px 12px 0 0;
+            flex-shrink: 0;
+        }
+        
+        .checkbox-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .checkbox-text strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .checkbox-text small {
+            color: var(--gray);
+            font-size: 0.85em;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .modal-actions .btn {
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+        .logs-section {
+            background: var(--secondary);
+            border-radius: 10px;
+            padding: 24px 18px;
+        }
+        .logs-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1.5px solid var(--border);
+        }
+        .log-entry {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Courier New', monospace;
+            font-size: 0.97em;
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(60,80,120,0.04);
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        .log-header:hover {
+            background-color: var(--primary-light);
+        }
+        .log-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .log-timestamp {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+        .log-bot {
+            background: var(--primary);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+        .log-action {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .log-toggle {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+        .log-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .log-content {
+            margin-top: 10px;
+            padding: 15px;
+            background: var(--primary-light);
+            border-radius: 5px;
+            border-left: 3px solid var(--primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.4;
+            color: var(--primary);
+        }
+        .log-content.expanded {
+            max-height: 600px;
+            padding: 15px;
+        }
+        .log-summary {
+            color: var(--gray);
+            font-style: italic;
+            margin-top: 5px;
+            padding: 8px;
+            background: var(--primary-light);
+            border-radius: 4px;
+            border-left: 2px solid var(--border);
+        }
+        .log-success {
+            color: var(--success);
+        }
+        .log-error {
+            color: var(--danger);
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
+        .error {
+            background: var(--danger);
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 7px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s, border 0.18s;
+            text-decoration: none;
+            display: inline-block;
+            outline: none;
+            box-shadow: 0 1px 2px rgba(60,80,120,0.04);
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover, .btn-success:focus {
+            background: #219150;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover, .btn-danger:focus {
+            background: #c0392b;
+        }
+        .btn-secondary {
+            background: var(--gray);
+            color: #fff;
+        }
+        .btn-secondary:hover, .btn-secondary:focus {
+            background: #495057;
+        }
+        .btn-warning {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-warning:hover, .btn-warning:focus {
+            background: #e1a800;
+        }
+        .btn:disabled {
+            background: #e0e4ea;
+            color: #b0b4bb;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* Custom checkbox styling */
+        .form-group input[type="checkbox"] {
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid var(--primary);
+            vertical-align: middle;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: border 0.18s;
+        }
+        .form-group input[type="checkbox"]:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        /* Enhanced Modal Styling */
+        .modal-content {
+            background-color: #fff;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            overflow: hidden;
+            transform: scale(0.9);
+            animation: modalOpen 0.3s ease forwards;
+        }
+        
+        @keyframes modalOpen {
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #4a6ba7 100%);
+            color: white;
+            padding: 24px 32px;
+            margin: 0;
+            border-radius: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .modal-header .close {
+            color: rgba(255,255,255,0.8);
+            font-size: 24px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        
+        .modal-header .close:hover {
+            color: white;
+        }
+        
+        #botForm {
+            padding: 32px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95em;
+        }
+        
+        .form-hint {
+            display: block;
+            margin-top: 6px;
+            color: var(--gray);
+            font-size: 0.85em;
+            line-height: 1.3;
+            font-style: italic;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 91, 160, 0.1);
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        
+        .checkbox-group {
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            margin: 0;
+            font-weight: normal;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 2px 12px 0 0;
+            flex-shrink: 0;
+        }
+        
+        .checkbox-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .checkbox-text strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .checkbox-text small {
+            color: var(--gray);
+            font-size: 0.85em;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .modal-actions .btn {
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+        /* Facebook Scheduler Styles */
+        .facebook-scheduler {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            background: var(--secondary);
+            border-radius: 12px;
+            padding: 28px;
+            border: 1.5px solid var(--border);
+        }
+        .scheduler-form {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(60,80,120,0.04);
+            border: 1.5px solid var(--border);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .scheduled-posts {
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(60,80,120,0.04);
+            border: 1.5px solid var(--border);
+        }
+        .scheduled-posts h3 {
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        .scheduled-posts-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .scheduled-post-item {
+            background: var(--primary-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.2s ease;
+        }
+        .scheduled-post-item:hover {
+            box-shadow: 0 4px 12px rgba(60,80,120,0.08);
+        }
+        .scheduled-post-item:last-child {
+            margin-bottom: 0;
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .post-datetime {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95em;
+        }
+        .post-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .status-scheduled {
+            background: var(--accent);
+            color: white;
+        }
+        .status-posted {
+            background: var(--success);
+            color: white;
+        }
+        .status-failed {
+            background: var(--danger);
+            color: white;
+        }
+        .post-text {
+            color: var(--gray);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .post-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        @media (max-width: 900px) {
+            .container {
+                padding: 18px 4px 18px 4px;
+            }
+            .bots-grid {
+                grid-template-columns: 1fr;
+            }
+            .section {
+                margin-bottom: 28px;
+            }
+            .facebook-scheduler {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Scheduler Status Styles */
+        .scheduler-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .scheduler-status-card {
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(60,80,120,0.04);
+        }
+        
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .status-indicator-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .status-indicator.status-running {
+            background: var(--success);
+            animation: pulse-green 2s infinite;
+        }
+        
+        .status-indicator.status-stopped {
+            background: var(--danger);
+        }
+        
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+        
+        .status-text {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--primary);
+            line-height: 1.4;
+        }
+        
+        .status-text small {
+            color: var(--gray);
+            font-size: 0.85em;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <!-- Scheduler Status Section -->
+            <div class="section">
+                <div class="scheduler-status-header">
+                    <h2>Stato Scheduler</h2>
+                    <button id="toggleSchedulerBtn" class="btn btn-success" onclick="toggleScheduler()">Start Scheduler</button>
+                </div>
+                <div class="scheduler-status-card">
+                    <div class="status-info">
+                        <div class="status-indicator-container">
+                            <div id="statusIndicator" class="status-indicator status-stopped"></div>
+                            <div id="statusText" class="status-text">
+                                Scheduler is stopped<br>
+                                <small>Caricamento stato...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="bots-header">
+                    <h2>Istanze Bot</h2>
+                </div>
+                <div id="botsContainer" class="bots-grid">
+                    <div class="loading">Caricamento bot...</div>
+                </div>
+            </div>
+            
+            <!-- Facebook Post Scheduling Section -->
+            <div class="section">
+                <h2>Pianificatore Post Facebook</h2>
+                <div class="facebook-scheduler">
+                    <div class="scheduler-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fbUsername">Email Facebook:</label>
+                                <input type="email" id="fbUsername" placeholder="tua-email@esempio.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fbPassword">Password Facebook:</label>
+                                <input type="password" id="fbPassword" placeholder="Inserisci password" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="scheduleDate">Data:</label>
+                                <input type="date" id="scheduleDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="scheduleTime">Ora (Roma):</label>
+                                <input type="time" id="scheduleTime" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fbPostText">Testo Post:</label>
+                            <textarea id="fbPostText" placeholder="A cosa stai pensando?" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fbImagePath">Percorso Immagine (opzionale):</label>
+                            <input type="text" id="fbImagePath" placeholder="es. /percorso/immagine.jpg">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-success" onclick="scheduleFacebookPost()">Pianifica Post</button>
+                            <button type="button" class="btn btn-secondary" onclick="clearFacebookForm()">Cancella Modulo</button>
+                        </div>
+                    </div>
+                    <div class="scheduled-posts">
+                        <h3>Post Pianificati</h3>
+                        <div id="scheduledPostsContainer" class="scheduled-posts-list">
+                            <div class="loading">Caricamento post pianificati...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Log Recenti</h2>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                    <button class="btn btn-danger" id="clearLogsBtn">Cancella Log</button>
+                </div>
+                <div class="logs-section">
+                    <div class="logs-container" id="logsContainer">
+                        <div class="loading">Caricamento log...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add/Edit Bot Modal -->
+    <div id="botModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Aggiungi Nuovo Bot</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="botForm">
+                <div class="form-group">
+                    <label for="botName">
+                        Nome Bot:
+                    </label>
+                    <input type="text" id="botName" required placeholder="es. Bot Ristorante Milano Centro">
+                    <small class="form-hint">Scegli un nome descrittivo per identificare facilmente il bot</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">
+                        Location Tag:
+                    </label>
+                    <input type="text" id="location" required placeholder="es. Milano, Roma, Napoli">
+                    <small class="form-hint">Indica la città o zona geografica del tuo business</small>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">
+                            Username Instagram:
+                        </label>
+                        <input type="text" id="username" required placeholder="es. il_mio_ristorante">
+                        <small class="form-hint">Il tuo nome utente Instagram</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">
+                            Password:
+                        </label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                        <small class="form-hint">La password del tuo account Instagram</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="hashtags">
+                        Hashtags (uno per riga):
+                    </label>
+                    <textarea id="hashtags" required placeholder="pizza&#10;pasta&#10;ristorante&#10;cucinaitaliana&#10;food&#10;milano"></textarea>
+                    <small class="form-hint">Inserisci gli hashtag più rilevanti per il tuo business, uno per riga</small>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="enabled">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">
+                            <strong>Abilita Bot</strong>
+                            <small>Il bot sarà disattivato per impostazione predefinita</small>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        Annulla
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        Salva Bot
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Dynamic API base URL that adapts to current host and port
+        const API_BASE = `${window.location.protocol}//${window.location.host}`;
+        let currentEditingBot = null;
+        
+        async function fetchAPI(endpoint) {
+            const response = await fetch(`${API_BASE}${endpoint}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        }
+
+        async function updateStatus() {
+            try {
+                const status = await fetchAPI('/status');
+                const indicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                const toggleBtn = document.getElementById('toggleSchedulerBtn');
+
+                if (status.schedulerRunning) {
+                    indicator.className = 'status-indicator status-running';
+                    statusText.innerHTML = `
+                        Scheduler is running<br>
+                        <small>Executions: ${status.executionCount || 0} | Uptime: ${Math.floor(status.uptime / 60)}m | Last check: ${status.lastCheck}</small>
+                    `;
+                    toggleBtn.textContent = 'Stop Scheduler';
+                    toggleBtn.className = 'btn btn-danger';
+                } else {
+                    indicator.className = 'status-indicator status-stopped';
+                    statusText.innerHTML = `
+                        Scheduler is stopped<br>
+                        <small>Total executions: ${status.executionCount || 0} | Last check: ${status.lastCheck}</small>
+                    `;
+                    toggleBtn.textContent = 'Start Scheduler';
+                    toggleBtn.className = 'btn btn-success';
+                }
+            } catch (error) {
+                document.getElementById('statusText').textContent = 'Errore nel caricamento dello stato';
+            }
+        }
+
+        async function updateBots() {
+            try {
+                const botsData = await fetchAPI('/bots');
+                const container = document.getElementById('botsContainer');
+                if (!botsData.bots || botsData.bots.length === 0) {
+                    container.innerHTML = `
+                        <div class="add-bot-card" onclick="openAddBotModal()">
+                            <div class="add-bot-icon">+</div>
+                            <h3>Aggiungi il Tuo Primo Bot</h3>
+                            <p>Clicca qui per aggiungere il tuo primo bot Instagram</p>
+                        </div>
+                    `;
+                    return;
+                }
+                // Always render all bots, regardless of enabled status
+                container.innerHTML = botsData.bots.map(bot => `
+                    <div class="bot-card">
+                        <div class="bot-header">
+                            <div class="bot-name">${bot.name}</div>
+                            <span class="bot-status status-${bot.enabled ? 'enabled' : 'disabled'}">
+                                ${bot.enabled ? 'In Esecuzione' : 'Fermato'}
+                            </span>
+                        </div>
+                        <div class="bot-info">
+                            <p><strong>Username:</strong> ${bot.credentials.username}</p>
+                            ${bot.location ? `<p><strong>Location Tag:</strong> ${bot.location}</p>` : ''}
+                            <p><strong>Hashtag:</strong></p>
+                            <div class="hashtags">
+                                ${bot.hashtags.map(tag => `<span class="hashtag">#${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="bot-actions">
+                            <button class="btn btn-success" onclick="startBot('${bot.id}')" ${bot.enabled ? 'disabled' : ''}>Avvia</button>
+                            <button class="btn btn-secondary" onclick="stopBot('${bot.id}')" ${!bot.enabled ? 'disabled' : ''}>Ferma</button>
+                            <button class="btn btn-warning" onclick="editBot('${bot.id}')">Modifica</button>
+                            <button class="btn btn-danger" onclick="deleteBot('${bot.id}')">Elimina</button>
+                        </div>
+                    </div>
+                `).join('') + `
+                    <div class="add-bot-card" onclick="openAddBotModal()">
+                        <div class="add-bot-icon">+</div>
+                        <h3>Aggiungi Nuovo Bot</h3>
+                        <p>Clicca qui per aggiungere un altro bot</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('botsContainer').innerHTML = '<div class="error">Errore nel caricamento dei bot</div>';
+            }
+        }
+
+        function truncateText(text, maxLength = 100) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        function toggleLogContent(logId) {
+            const content = document.getElementById(`log-content-${logId}`);
+            const toggle = document.getElementById(`log-toggle-${logId}`);
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.textContent = '▶';
+            } else {
+                content.classList.add('expanded');
+                toggle.textContent = '▼';
+            }
+        }
+
+        async function updateLogs() {
+            try {
+                const logsData = await fetchAPI('/logs');
+                const container = document.getElementById('logsContainer');
+                
+                if (logsData.logs.length === 0) {
+                    container.innerHTML = '<div class="loading">Nessun log disponibile</div>';
+                    return;
+                }
+
+                container.innerHTML = logsData.logs.map((log, index) => {
+                    const logId = `log-${index}`;
+                    const isSuccess = log.success;
+                    const details = log.details || '';
+                    const truncatedDetails = truncateText(details, 80);
+                    const hasMoreContent = details.length > 80;
+                    
+                    return `
+                        <div class="log-entry">
+                            <div class="log-header" onclick="toggleLogContent('${logId}')">
+                                <div class="log-header-left">
+                                    <span class="log-timestamp">${new Date(log.timestamp).toLocaleString('it-IT')}</span>
+                                    <span class="log-bot">${log.botId || 'sistema'}</span>
+                                    <span class="log-action log-${isSuccess ? 'success' : 'error'}">${log.action}</span>
+                                </div>
+                                ${hasMoreContent ? `<button class="log-toggle" id="log-toggle-${logId}">▶</button>` : ''}
+                            </div>
+                            ${hasMoreContent ? `
+                                <div class="log-summary log-${isSuccess ? 'success' : 'error'}">
+                                    ${truncatedDetails}
+                                </div>
+                                <div class="log-content" id="log-content-${logId}">
+                                    ${details.replace(/\n/g, '<br>')}
+                                </div>
+                            ` : `
+                                <div class="log-summary log-${isSuccess ? 'success' : 'error'}">
+                                    ${details}
+                                </div>
+                            `}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                document.getElementById('logsContainer').innerHTML = '<div class="error">Errore nel caricamento dei log</div>';
+            }
+        }
+
+        async function startBot(botId) {
+            try {
+                const response = await fetch(`${API_BASE}/bots/${botId}/enabled`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled: true })
+                });
+                await response.json(); // ensure promise resolves
+                await refreshData();
+            } catch (error) {
+                alert('Errore nell\'avvio del bot');
+            }
+        }
+
+        async function stopBot(botId) {
+            try {
+                const response = await fetch(`${API_BASE}/bots/${botId}/enabled`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled: false })
+                });
+                await response.json(); // ensure promise resolves
+                await refreshData();
+            } catch (error) {
+                alert('Errore nell\'arresto del bot');
+            }
+        }
+
+        function openAddBotModal() {
+            currentEditingBot = null;
+            document.getElementById('modalTitle').textContent = 'Aggiungi Nuovo Bot';
+            document.getElementById('botForm').reset();
+            document.getElementById('enabled').checked = false; // Ensure new bots start disabled
+            document.getElementById('botModal').style.display = 'block';
+            document.body.classList.add('modal-open'); // Lock body scroll
+        }
+
+        function closeModal() {
+            document.getElementById('botModal').style.display = 'none';
+            document.body.classList.remove('modal-open'); // Unlock body scroll
+            currentEditingBot = null;
+        }
+
+        async function editBot(botId) {
+            try {
+                const bot = await fetchAPI(`/bots/${botId}`);
+                currentEditingBot = bot.bot;
+                document.getElementById('modalTitle').textContent = 'Modifica Bot';
+                document.getElementById('botName').value = bot.bot.name;
+                document.getElementById('location').value = bot.bot.location || '';
+                document.getElementById('username').value = bot.bot.credentials.username;
+                document.getElementById('password').value = bot.bot.credentials.password;
+                document.getElementById('hashtags').value = bot.bot.hashtags.join('\n');
+                document.getElementById('enabled').checked = false; // Always stop after edit
+                document.getElementById('botModal').style.display = 'block';
+                document.body.classList.add('modal-open'); // Lock body scroll
+            } catch (error) {
+                alert('Errore nel caricamento dei dettagli del bot');
+            }
+        }
+
+        async function deleteBot(botId) {
+            if (!confirm('Sei sicuro di voler eliminare questo bot?')) return;
+            
+            try {
+                console.log(`Tentativo di eliminazione bot con ID: ${botId}`);
+                console.log(`URL chiamata: ${API_BASE}/bots/${botId}`);
+                const response = await fetch(`${API_BASE}/bots/${botId}`, { method: 'DELETE' });
+                const data = await response.json();
+                console.log('Risposta server:', data);
+                
+                if (!response.ok || data.success === false) {
+                    console.error('Errore eliminazione:', data);
+                    alert(data.message || 'Errore nell\'eliminazione del bot');
+                    return;
+                }
+                alert('Bot eliminato con successo!');
+                await refreshData();
+            } catch (error) {
+                console.error('Errore eliminazione bot:', error);
+                alert('Errore nell\'eliminazione del bot: ' + error.message);
+            }
+        }
+
+        document.getElementById('botForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Generate automatic ID from bot name
+            const botName = document.getElementById('botName').value.trim();
+            const automaticId = botName.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                .replace(/\s+/g, '_') // Replace spaces with underscores
+                .substring(0, 20) + '_' + Date.now().toString().slice(-4); // Add timestamp suffix
+            
+            const formData = {
+                id: currentEditingBot ? currentEditingBot.id : automaticId,
+                name: botName,
+                location: document.getElementById('location').value.trim(),
+                credentials: {
+                    username: document.getElementById('username').value.trim(),
+                    password: document.getElementById('password').value
+                },
+                hashtags: document.getElementById('hashtags').value.split('\n').filter(tag => tag.trim()),
+                enabled: document.getElementById('enabled').checked
+            };
+
+            // Validate required fields
+            if (!formData.name || !formData.location || !formData.credentials.username || !formData.credentials.password) {
+                alert('Tutti i campi sono obbligatori');
+                return;
+            }
+
+            // Validate hashtags
+            if (formData.hashtags.length === 0) {
+                alert('Inserisci almeno un hashtag');
+                return;
+            }
+
+            try {
+                let response, data;
+                if (currentEditingBot && currentEditingBot.id) {
+                    // Edit existing bot
+                    response = await fetch(`${API_BASE}/bots/${currentEditingBot.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    // Add new bot
+                    response = await fetch(`${API_BASE}/bots`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                }
+                data = await response.json();
+                if (!response.ok || data.success === false) {
+                    alert(data.message || 'Errore nella salvataggio del bot');
+                    return;
+                }
+                closeModal();
+                await refreshData();
+            } catch (error) {
+                alert('Errore nella salvataggio del bot');
+            }
+        });
+
+        // Facebook Scheduler Functions
+        async function scheduleFacebookPost() {
+            const username = document.getElementById('fbUsername').value;
+            const password = document.getElementById('fbPassword').value;
+            const date = document.getElementById('scheduleDate').value;
+            const time = document.getElementById('scheduleTime').value;
+            const text = document.getElementById('fbPostText').value;
+            const imagePath = document.getElementById('fbImagePath').value;
+
+            if (!username || !password || !date || !time || !text) {
+                alert('Per favore, riempi tutti i campi obbligatori');
+                return;
+            }
+
+            // Convert Rome time to UTC properly
+            // Create the datetime string and interpret it as Rome time
+            const romeDateTimeString = `${date}T${time}:00`;
+            
+            // Create a temporary date to check for DST
+            const checkDate = new Date(date + 'T12:00:00Z');
+            const romeOffset = checkDate.toLocaleString('en-US', {timeZone: 'Europe/Rome'}).includes('GMT') ? 1 : 
+                              (checkDate.getMonth() > 2 && checkDate.getMonth() < 10) ? 2 : 1;
+            
+            // Simple approach: create UTC date by subtracting Rome offset
+            const romeDateTime = new Date(romeDateTimeString);
+            const utcDateTime = new Date(romeDateTime.getTime() - (romeOffset * 60 * 60 * 1000));
+            const scheduledDateTime = utcDateTime.toISOString();
+            
+            console.log(`Tempo Roma input: ${romeDateTimeString}`);
+            console.log(`Tempo UTC per backend: ${scheduledDateTime}`);
+            console.log(`Offset Roma applicato: -${romeOffset} ore`);
+            
+            try {
+                const response = await fetch(`${API_BASE}/facebook/schedule`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        scheduledTime: scheduledDateTime,
+                        text,
+                        imagePath: imagePath || null
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok || data.success === false) {
+                    alert(data.message || 'Errore nella pianificazione del post Facebook');
+                    return;
+                }
+
+                alert('Post Facebook pianificato con successo!');
+                clearFacebookForm();
+                await updateScheduledPosts();
+            } catch (error) {
+                console.error('Errore nella pianificazione del post Facebook:', error);
+                alert('Errore nella pianificazione del post Facebook');
+            }
+        }
+
+        function clearFacebookForm() {
+            document.getElementById('fbUsername').value = '';
+            document.getElementById('fbPassword').value = '';
+            document.getElementById('scheduleDate').value = '';
+            document.getElementById('scheduleTime').value = '';
+            document.getElementById('fbPostText').value = '';
+            document.getElementById('fbImagePath').value = '';
+        }
+
+        async function updateScheduledPosts() {
+            try {
+                const response = await fetch(`${API_BASE}/facebook/scheduled`);
+                const data = await response.json();
+                const container = document.getElementById('scheduledPostsContainer');
+
+                if (!data.posts || data.posts.length === 0) {
+                    container.innerHTML = '<div class="loading">Nessun post pianificato</div>';
+                    return;
+                }
+
+                container.innerHTML = data.posts.map(post => {
+                    const scheduledDate = new Date(post.scheduledTime);
+                    const formattedDate = scheduledDate.toLocaleDateString('it-IT', { 
+                        timeZone: 'Europe/Rome',
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    const formattedTime = scheduledDate.toLocaleTimeString('it-IT', { 
+                        timeZone: 'Europe/Rome',
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+
+                    return `
+                        <div class="scheduled-post-item">
+                            <div class="post-header">
+                                <div class="post-datetime">${formattedDate} at ${formattedTime}</div>
+                                <span class="post-status status-${post.status}">${post.status.charAt(0).toUpperCase() + post.status.slice(1)}</span>
+                            </div>
+                            <div class="post-text">${post.text.length > 100 ? post.text.substring(0, 100) + '...' : post.text}</div>
+                            ${post.imagePath ? `<div style="font-size: 0.8em; color: var(--gray);">Image: ${post.imagePath}</div>` : ''}
+                            <div class="post-actions">
+                                ${post.status === 'scheduled' ? `
+                                    <button class="btn btn-danger btn-small" onclick="cancelFacebookPost('${post.id}')">Annulla</button>
+                                    <button class="btn btn-warning btn-small" onclick="editFacebookPost('${post.id}')">Modifica</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Errore nel caricamento dei post pianificati:', error);
+                document.getElementById('scheduledPostsContainer').innerHTML = '<div class="error">Errore nel caricamento dei post pianificati</div>';
+            }
+        }
+
+        async function cancelFacebookPost(postId) {
+            if (!confirm('Sei sicuro di voler annullare questo post pianificato?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/facebook/cancel/${postId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (!response.ok || data.success === false) {
+                    alert(data.message || 'Errore nell\'annullamento del post');
+                    return;
+                }
+                
+                alert('Post annullato con successo');
+                await updateScheduledPosts();
+            } catch (error) {
+                console.error('Errore nell\'annullamento del post:', error);
+                alert('Errore nell\'annullamento del post');
+            }
+        }
+
+        async function editFacebookPost(postId) {
+            // TODO: Implementa funzionalità di modifica
+            alert('Funzionalità di modifica in arrivo!');
+        }
+
+        async function toggleScheduler() {
+            try {
+                const status = await fetchAPI('/status');
+                const endpoint = status.schedulerRunning ? '/stop' : '/start';
+                const response = await fetch(`${API_BASE}${endpoint}`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const action = status.schedulerRunning ? 'fermato' : 'avviato';
+                    console.log(`Scheduler ${action} con successo!`);
+                    await updateStatus();
+                } else {
+                    alert('Errore nel cambio dello stato del Scheduler: ' + (data.message || 'Sconosciuto'));
+                }
+            } catch (error) {
+                console.error('Error toggling scheduler:', error);
+                alert('Errore nel cambio dello stato del Scheduler: ' + error.message);
+            }
+        }
+
+        async function refreshData() {
+            await Promise.all([
+                updateBots(),
+                updateLogs(),
+                updateScheduledPosts(),
+                updateStatus() // Refresh status after each update
+            ]);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('botModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initial load
+        refreshData();
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const clearLogsBtn = document.getElementById('clearLogsBtn');
+            if (clearLogsBtn) {
+                clearLogsBtn.onclick = async function() {
+                    if (!confirm('Sei sicuro di voler cancellare tutti i log?')) return;
+                    await fetch(`${API_BASE}/logs/clear`, { method: 'POST' });
+                    await refreshData();
+                };
+            }
+        });
+    </script>
+</body>
+</html>
